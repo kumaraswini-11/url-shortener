@@ -5,6 +5,8 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { LinkRow, createLinksColumns } from "@/components/links/links-columns";
 import { LinksDataTable } from "@/components/links/links-data-table";
+import { deleteLink } from "@/lib/actions/delete-link";
+import { toast } from "sonner";
 
 interface LinksPageClientProps {
   initialLinks: LinkRow[];
@@ -15,11 +17,14 @@ export function LinksTableContainer({ initialLinks }: LinksPageClientProps) {
   const [links, setLinks] = useState<LinkRow[]>(initialLinks);
   const [isPending, startTransition] = useTransition();
 
-  // Server Action for delete
   const handleDelete = async (code: string) => {
     startTransition(async () => {
-      // await deleteLink(code); // ← Your real server action
-      setLinks((prev) => prev.filter((l) => l.code !== code));
+      try {
+        await deleteLink(code);
+        toast.success("Link deleted");
+      } catch (err) {
+        toast.error("Failed to delete link");
+      }
     });
   };
 

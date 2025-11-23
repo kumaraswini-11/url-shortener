@@ -36,17 +36,16 @@ import { Loader } from "./loader";
 import { CopyButton } from "./copy-button";
 
 // Zod schema for validation
-const urlShortenerFormSchema = z.object({
+export const shortCodeSchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9]{6,32}$/, "Invalid short code");
+
+export const urlShortenerFormSchema = z.object({
   originalUrl: z.url(),
-  customCode: z
-    .string()
-    .regex(/^[a-zA-Z0-9]{6,16}$/, {
-      message: "Custom code must be 6–16 alphanumeric characters",
-    })
-    .optional(),
+  customCode: shortCodeSchema.optional(),
 });
 
-type UrlFormData = z.infer<typeof urlShortenerFormSchema>;
+export type UrlFormData = z.infer<typeof urlShortenerFormSchema>;
 
 export function UrlShortener() {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,17 +63,36 @@ export function UrlShortener() {
 
   const onSubmit = async (data: UrlFormData) => {
     console.log("Submitting data:", data);
-
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const mockShortUrl = `https://short.ly/${Math.random()
-      .toString(36)
-      .substring(2, 9)}`;
-    setShortenedUrl(mockShortUrl);
-    setIsLoading(false);
-    toast.success("URL shortened successfully!");
-    reset();
+
+    try {
+      const response = await fetch("/api/links", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log("API response:", result);
+
+      if (!response.ok) {
+        console.error("Error shortening URL:", result);
+        toast.error(result.error || "Failed to shorten URL");
+      } else {
+        // The API returns the inserted link object
+        const shortUrl = `${window.location.origin}/${result.code}`;
+        setShortenedUrl(shortUrl);
+        toast.success("URL shortened successfully!");
+        reset(); // Reset the form
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -123,14 +141,14 @@ export function UrlShortener() {
                     id="customCode"
                     placeholder="mycode123"
                     minLength={6}
-                    maxLength={16}
+                    maxLength={32}
                     className="font-mono"
                     disabled={isLoading}
                     {...register("customCode")}
                   />
                   <FieldError>{errors.customCode?.message}</FieldError>
                   <FieldDescription>
-                    Leave empty to auto-generate. Must be 6–16 alphanumeric
+                    Leave empty to auto-generate. Must be 6–32 alphanumeric
                     characters.
                   </FieldDescription>
                 </Field>
