@@ -3,14 +3,15 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 import { links } from "@/lib/db/schema";
-import { shortCodeSchema } from "@/components/url-shortener";
+import { shortCodeSchema } from "@/lib/zod-schemas";
 
+// This is the new required signature in Next.js 15+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const code = params.code.trim();
+    const { code } = await params;
 
     // Validate code format
     const parsed = shortCodeSchema.safeParse(code);
@@ -40,10 +41,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const code = params.code.trim();
+    const { code } = await params;
 
     // Validate code
     const parsed = shortCodeSchema.safeParse(code);
