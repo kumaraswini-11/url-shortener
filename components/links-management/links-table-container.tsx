@@ -1,38 +1,50 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { LinkRow, createLinksColumns } from "@/components/links/links-columns";
-import { LinksDataTable } from "@/components/links/links-data-table";
-import { deleteLink } from "@/lib/actions/delete-link";
 import { toast } from "sonner";
 
-interface LinksPageClientProps {
+import { Input } from "@/components/ui/input";
+import {
+  LinkRow,
+  createLinksColumns,
+} from "@/components/links-management/links-columns";
+import { LinkDataTable } from "@/components/links-management/links-data-table";
+import { deleteLink } from "@/lib/actions/delete-link";
+
+interface LinksTableContainerProps {
   initialLinks: LinkRow[];
 }
 
-export function LinksTableContainer({ initialLinks }: LinksPageClientProps) {
+export function LinksTableContainer({
+  initialLinks,
+}: LinksTableContainerProps) {
   const [search, setSearch] = useState("");
   const [links, setLinks] = useState<LinkRow[]>(initialLinks);
   const [isPending, startTransition] = useTransition();
 
-  const handleDelete = async (code: string) => {
-    startTransition(async () => {
-      try {
-        await deleteLink(code);
-        toast.success("Link deleted");
-      } catch (err) {
-        toast.error("Failed to delete link");
-      }
-    });
-  };
-
+  // Give filterd results
   const filteredLinks = links.filter((link) =>
     `${link.code} ${link.targetUrl}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
+
+  const handleDelete = async (code: string) => {
+    startTransition(async () => {
+      try {
+        await deleteLink(code);
+
+        // Remove the deleted link from local state
+        setLinks((prev) => prev.filter((link) => link.code !== code));
+
+        toast.success("Link deleted successfully");
+      } catch (err) {
+        console.error("Failed to delete link:", err);
+        toast.error("Failed to delete link");
+      }
+    });
+  };
 
   const columns = createLinksColumns(handleDelete);
 
@@ -50,11 +62,13 @@ export function LinksTableContainer({ initialLinks }: LinksPageClientProps) {
       </div>
 
       {/* Table */}
-      <LinksDataTable
-        columns={columns}
-        data={filteredLinks}
-        isLoading={isPending}
-      />
+      <Suspense fallback={null}>
+        <LinkDataTable
+          columns={columns}
+          data={filteredLinks}
+          isLoading={isPending}
+        />
+      </Suspense>
     </div>
   );
 }

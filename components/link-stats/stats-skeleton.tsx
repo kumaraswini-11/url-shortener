@@ -1,7 +1,9 @@
+"use client";
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function StatsSkeleton() {
+export function StatsSkeleton() {
   return (
     <main className="min-h-screen bg-linear-to-br from-background to-muted/10 px-4 py-6">
       <div className="container mx-auto max-w-6xl">

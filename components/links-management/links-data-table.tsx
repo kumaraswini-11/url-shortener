@@ -17,21 +17,43 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LinkRow } from "@/components/links/links-columns";
 
-interface LinksTableProps {
-  columns: ColumnDef<LinkRow>[];
-  data: LinkRow[];
+export interface LinkDataTableProps<TData> {
+  columns: ColumnDef<TData>[];
+  data: TData[];
   isLoading?: boolean;
   isError?: boolean;
 }
 
-export function LinksDataTable({
+export function TableSkeleton({
+  columns,
+  rows = 5,
+}: {
+  columns: number;
+  rows?: number;
+}) {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <TableRow key={rowIndex}>
+          {Array.from({ length: columns }).map((_, colIndex) => (
+            <TableCell key={colIndex} className="px-4 py-5">
+              <Skeleton className="h-4 w-full rounded" />
+            </TableCell>
+          ))}
+        </TableRow>
+      ))}
+    </>
+  );
+}
+
+export function LinkDataTable<TData>({
   columns,
   data,
   isLoading = false,
   isError = false,
-}: LinksTableProps) {
+}: LinkDataTableProps<TData>) {
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

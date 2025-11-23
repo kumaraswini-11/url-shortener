@@ -2,12 +2,10 @@
 
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 
 import { db } from "@/lib/db";
 import { links, clicks } from "@/lib/db/schema";
-import { LinkStatsView } from "@/components/stats/link-stats-view";
-import { StatsSkeleton } from "@/components/stats/stats-skeleton";
+import { LinkStatsView } from "@/components/link-stats/link-stats-view";
 
 export default async function LinkStatsPage({
   params,
@@ -36,6 +34,7 @@ export default async function LinkStatsPage({
 
   const link = linkResult[0];
 
+  // This query will stream in while the shell is already interactive!
   const clickEvents = await db
     .select({
       id: clicks.id,
@@ -51,12 +50,22 @@ export default async function LinkStatsPage({
     .orderBy(desc(clicks.clickedAt))
     .limit(50);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
   const shortUrl = `${baseUrl}/${link.code}`;
 
-  return (
-    <Suspense fallback={<StatsSkeleton />}>
-      <LinkStatsView link={link} clicks={clickEvents} shortUrl={shortUrl} />
-    </Suspense>
-  );
+  // No Suspense needed! "use cache" handles streaming + fallback automatically
+  return <LinkStatsView link={link} clicks={clickEvents} shortUrl={shortUrl} />;
+}
+
+//  Beautiful SEO
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string }>;
+}) {
+  const { code } = await params;
+  return {
+    title: `Stats for ${process.env.NEXT_PUBLIC_BASE_URL}/${code}`,
+    description: `Analytics and click details for your shortened link`,
+  };
 }

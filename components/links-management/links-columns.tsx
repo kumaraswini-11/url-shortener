@@ -1,11 +1,10 @@
 "use client";
 
 import { format, formatDistanceToNow } from "date-fns";
-import { ExternalLink, BarChart3, Trash2 } from "lucide-react";
+import { ExternalLink, BarChart3 } from "lucide-react";
 import Link from "next/link";
-import { ColumnDef } from "@tanstack/react-table";
 import { Route } from "next";
-import { useTransition } from "react";
+import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,19 +13,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { CopyButton } from "@/components/copy-button";
 import { truncateUrl } from "@/lib/utils";
+import { DeleteAction } from "./delete-dialog";
 
 // Defines the structure for a single row of link data.
 export type LinkRow = {
@@ -38,7 +27,7 @@ export type LinkRow = {
 };
 
 // Reusable URL preview component (used in Original URL cell)
-const UrlPreview: React.FC<{ url: string }> = ({ url }) => {
+const UrlPreviewCell: React.FC<{ url: string }> = ({ url }) => {
   const hostname = new URL(url).hostname;
   const pathname = new URL(url).pathname;
   const displayText = `${hostname}${truncateUrl(pathname, 30)}`;
@@ -104,58 +93,6 @@ const LastClickedCell = ({ date }: { date: Date | null }) => {
   );
 };
 
-// Delete confirmation using AlertDialog (Shadcn/UI preferred over Dialog for confirmations)
-export const DeleteAction = ({
-  code,
-  onDelete,
-}: {
-  code: string;
-  onDelete: (code: string) => void;
-}) => {
-  const [pending, startTransition] = useTransition();
-
-  const handleDelete = () => {
-    startTransition(() => {
-      onDelete(code);
-    });
-  };
-
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-9 text-destructive hover:text-destructive hover:bg-destructive/10"
-          disabled={pending}
-        >
-          <Trash2 className="size-4" />
-          <span className="sr-only">Delete link {code}</span>
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete short link permanently?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This will delete <code className="font-mono font-bold">{code}</code>{" "}
-            forever. This action <strong>cannot</strong> be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            // variant="destructive"
-            onClick={handleDelete}
-            disabled={pending}
-          >
-            {pending ? "Deleting..." : "Delete Permanently"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-};
-
 // Main column factory
 export const createLinksColumns = (
   onDelete: (code: string) => Promise<void> | void
@@ -163,7 +100,7 @@ export const createLinksColumns = (
   {
     accessorKey: "targetUrl",
     header: "Original URL",
-    cell: ({ row }) => <UrlPreview url={row.original.targetUrl} />,
+    cell: ({ row }) => <UrlPreviewCell url={row.original.targetUrl} />,
     size: 320,
   },
   {

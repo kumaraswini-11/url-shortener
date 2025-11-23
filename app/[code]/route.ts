@@ -1,12 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-// import { shortCodeSchema } from "@/components/url-shortener";
 import { db } from "@/lib/db";
 import { links, clicks } from "@/lib/db/schema";
 import { getGeoFromIp } from "@/lib/utils/get-geo-from-ip";
 import { getVisitorIp } from "@/lib/utils/ip";
 import { parseUserAgent } from "@/lib/utils/parse-user-agent";
+// import { shortCodeSchema } from "@/lib/zod-schemas";
 
 export async function GET(
   request: NextRequest,

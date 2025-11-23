@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Helper: Truncate long URLs for display
-export const truncateUrl = (url: string, maxLength = 50) => {
+export const truncateUrl = (url: string, maxLength = 50): string => {
   return url.length > maxLength ? url.substring(0, maxLength) + "..." : url;
 };
 

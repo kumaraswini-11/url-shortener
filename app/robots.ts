@@ -15,8 +15,6 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*", // Apply rules to all web crawlers
         allow: "/", // Allow crawling of the entire site by default
-        // Disallow crawling of specific paths (e.g., private admin pages, search results)
-        disallow: ["/private/"],
       },
     ],
 

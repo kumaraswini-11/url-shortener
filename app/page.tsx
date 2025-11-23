@@ -1,16 +1,17 @@
 import { desc, isNull } from "drizzle-orm";
-import { LinksTableContainer } from "@/components/links/links-table-container";
+import { cacheTag } from "next/cache";
+
+import { LinksTableContainer } from "@/components/links-management/links-table-container";
 import { db } from "@/lib/db";
 import { links } from "@/lib/db/schema";
 import { Header } from "@/components/header";
 import { UrlShortener } from "@/components/url-shortener";
-// import { cacheTag } from "next/cache";
 
 export async function getLinks() {
-  try {
-    // ("use cache");
-    // cacheTag("get-all-links");
+  "use cache";
+  cacheTag("get-all-links");
 
+  try {
     const allLinks = await db
       .select()
       .from(links)

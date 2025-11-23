@@ -34,18 +34,7 @@ import {
 
 import { Loader } from "./loader";
 import { CopyButton } from "./copy-button";
-
-// Zod schema for validation
-export const shortCodeSchema = z
-  .string()
-  .regex(/^[a-zA-Z0-9]{6,32}$/, "Invalid short code");
-
-export const urlShortenerFormSchema = z.object({
-  originalUrl: z.url(),
-  customCode: shortCodeSchema.optional(),
-});
-
-export type UrlFormData = z.infer<typeof urlShortenerFormSchema>;
+import { UrlFormData, urlShortenerFormSchema } from "@/lib/zod-schemas";
 
 export function UrlShortener() {
   const [isLoading, setIsLoading] = useState(false);
