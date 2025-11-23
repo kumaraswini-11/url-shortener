@@ -1,10 +1,9 @@
 import { isNull } from "drizzle-orm";
 import type { MetadataRoute } from "next";
+
 import { db } from "@/lib/db";
 import { links } from "@/lib/db/schema";
-
-// Define the base URL of your application
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL!;
+import { BASE_URL } from "@/lib/constants";
 
 /**
  * Generates the sitemap.xml file.
@@ -15,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Static Routes (Manually defined)
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: BASE_URL,
+      url: BASE_URL!,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,

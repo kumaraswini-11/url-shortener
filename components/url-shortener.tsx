@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -86,7 +85,7 @@ export function UrlShortener() {
 
   return (
     <>
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl mx-auto mt-2">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold flex items-center justify-center gap-3">
             <Link2 className="w-8 h-8" />

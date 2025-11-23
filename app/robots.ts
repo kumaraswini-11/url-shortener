@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 
-// Define the base URL locally for simplicity
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL;
+import { BASE_URL } from "@/lib/constants";
 
 /**
  * Generates the robots.txt file.

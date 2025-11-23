@@ -49,7 +49,7 @@ export function LinksTableContainer({
   const columns = createLinksColumns(handleDelete);
 
   return (
-    <div className="space-y-4 max-w-7xl mx-auto">
+    <div className="space-y-4 max-w-7xl mx-auto mt-2">
       {/* Search */}
       <div className="relative max-w-md mt-2">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />

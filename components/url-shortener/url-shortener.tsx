@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link2 } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { UrlFormData, urlShortenerFormSchema } from "@/lib/zod-schemas";
+import { createShortUrl } from "@/lib/actions/create-short-url";
 
 import { UrlForm } from "./url-form";
 import { SuccessDialog } from "./success-dialog";
@@ -29,22 +31,11 @@ export function UrlShortener() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/links", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        toast.error(result.error || "Failed to shorten URL");
-      } else {
-        const shortUrl = `${window.location.origin}/${result.code}`;
-        setShortenedUrl(shortUrl);
-        toast.success("URL shortened successfully!");
-        form.reset();
-      }
+      const result = await createShortUrl(data);
+      const shortUrl = `${window.location.origin}/${result.code}`;
+      setShortenedUrl(shortUrl);
+      toast.success("URL shortened successfully!");
+      form.reset();
     } catch (err) {
       toast.error("Something went wrong");
     } finally {

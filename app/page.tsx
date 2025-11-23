@@ -1,5 +1,6 @@
 import { desc, isNull } from "drizzle-orm";
-import { cacheTag } from "next/cache";
+// import { cacheTag } from "next/cache";
+// import { cacheLife } from "next/cache";
 
 import { LinksTableContainer } from "@/components/links-management/links-table-container";
 import { db } from "@/lib/db";
@@ -8,8 +9,9 @@ import { Header } from "@/components/header";
 import { UrlShortener } from "@/components/url-shortener";
 
 export async function getLinks() {
-  "use cache";
-  cacheTag("get-all-links");
+  // "use cache";
+  // cacheTag("get-all-links");
+  // cacheLife({ revalidate: 100 }); // 1 minutes
 
   try {
     const allLinks = await db
@@ -18,7 +20,6 @@ export async function getLinks() {
       .where(isNull(links.deletedAt))
       .orderBy(desc(links.createdAt));
 
-    console.log("Database query result:", allLinks);
     return allLinks;
   } catch (error) {
     console.error("Error fetching links:", error);
@@ -33,8 +34,10 @@ export async function LinksTable() {
 
 export default function Home() {
   return (
-    <div className="contain-content max-w-7xl">
-      <Header /> <UrlShortener /> <LinksTable />
-    </div>
+    <>
+      <Header />
+      <UrlShortener />
+      <LinksTable />
+    </>
   );
 }

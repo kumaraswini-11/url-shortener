@@ -16,6 +16,7 @@ import {
 import { CopyButton } from "@/components/copy-button";
 import { truncateUrl } from "@/lib/utils";
 import { DeleteAction } from "./delete-dialog";
+import { BASE_URL } from "@/lib/constants";
 
 // Defines the structure for a single row of link data.
 export type LinkRow = {
@@ -54,9 +55,7 @@ const UrlPreviewCell: React.FC<{ url: string }> = ({ url }) => {
 // Short URL cell with external link
 const ShortUrlCell = ({ code }: { code: string }) => {
   const baseUrl =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_APP_URL!;
+    typeof window !== "undefined" ? window.location.origin : BASE_URL;
   const shortUrl = `${baseUrl}/${code}`;
 
   return (

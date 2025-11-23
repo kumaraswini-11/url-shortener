@@ -1,11 +1,10 @@
-"use cache";
-
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { db } from "@/lib/db";
 import { links, clicks } from "@/lib/db/schema";
 import { LinkStatsView } from "@/components/link-stats/link-stats-view";
+import { BASE_URL } from "@/lib/constants";
 
 export default async function LinkStatsPage({
   params,
@@ -50,8 +49,7 @@ export default async function LinkStatsPage({
     .orderBy(desc(clicks.clickedAt))
     .limit(50);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
-  const shortUrl = `${baseUrl}/${link.code}`;
+  const shortUrl = `${BASE_URL}/${link.code}`;
 
   // No Suspense needed! "use cache" handles streaming + fallback automatically
   return <LinkStatsView link={link} clicks={clickEvents} shortUrl={shortUrl} />;
@@ -65,7 +63,7 @@ export async function generateMetadata({
 }) {
   const { code } = await params;
   return {
-    title: `Stats for ${process.env.NEXT_PUBLIC_BASE_URL}/${code}`,
+    title: `Stats for ${BASE_URL}/${code}`,
     description: `Analytics and click details for your shortened link`,
   };
 }

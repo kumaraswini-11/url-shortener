@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   },
   typedRoutes: true,
   reactCompiler: true,
-  cacheComponents: true,
+  // cacheComponents: true,
   typescript: {
     // !! WARN !!
     // Dangerously allow production builds to successfully complete even if
