@@ -14,7 +14,7 @@ export const links = pgTable(
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     code: varchar("code", { length: 32 }).notNull().unique(), // 32 = safe for long custom codes
     targetUrl: text("target_url").notNull(),
-    totalClicks: integer("total_clicks").notNull().default(0),
+    clicks: integer("total_clicks").notNull().default(0), // total number of clicks on that particular shortened URL
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -38,10 +38,13 @@ export const clicks = pgTable(
       .references(() => links.id, { onDelete: "cascade" }),
 
     // Core
-    timestamp: timestamp("timestamp", { withTimezone: true })
+    clickedAt: timestamp("clicked_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    ip: varchar("ip", { length: 45 }).notNull(), // IPv6 support
+    ipAddress: varchar("ip_address", { length: 45 }).notNull(), // IPv6 support
+
+    // Raw user agent (always store)
+    userAgent: text("user_agent").notNull(),
 
     // Location (optional — from IP geolocation API — not from UA parser)
     country: varchar("country", { length: 2 }),
@@ -50,9 +53,6 @@ export const clicks = pgTable(
     city: varchar("city", { length: 100 }),
     latitude: varchar("latitude", { length: 20 }),
     longitude: varchar("longitude", { length: 20 }),
-
-    // Raw user agent (always store)
-    userAgent: text("user_agent").notNull(),
 
     // ua-parser-js fields
     browserName: varchar("browser_name", { length: 50 }),
@@ -68,7 +68,7 @@ export const clicks = pgTable(
   },
   (table) => [
     index("clicks_link_id_idx").on(table.linkId),
-    index("clicks_timestamp_idx").on(table.timestamp),
+    index("clicks_timestamp_idx").on(table.clickedAt),
     index("clicks_country_idx").on(table.country),
     index("clicks_browser_name_idx").on(table.browserName),
   ]
